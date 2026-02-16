@@ -1,0 +1,26 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.10'
+
+- script: |
+    pip install -r requirements.txt
+  displayName: Install dependencies
+
+- script: |
+    dvc repro
+  displayName: Run training pipeline
+
+- script: |
+    python src/evaluate.py
+  displayName: Evaluate model
+
+- script: |
+    docker build -t iris-api .
+  displayName: Build Docker image
